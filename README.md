@@ -1,2 +1,2 @@
 # PadUtility
-Utility for Puzzle &amp; Dragons (Root)
+Utility for Puzzle & Dragons (Root)
