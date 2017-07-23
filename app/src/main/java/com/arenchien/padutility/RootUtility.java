@@ -78,4 +78,98 @@ public class RootUtility {
         return null;
     }
 
+    int nEventCounter = 5000;
+
+    public void DeviceDownEvent( int x, int y ) {
+        if ( m_kReader == null || m_kWriter == null ) {
+            return;
+        }
+
+        x = ( int ) ( ( float ) x * 1.333333 );
+        y = ( int ) ( ( float ) y * 1.333333 );
+
+        try {
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 3 57 " + nEventCounter + " \n" );
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 1 330 1 \n" );
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 3 48 61 \n" );
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 3 53 " + x + " \n" );
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 3 54 " + y + " \n" );
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 0 0 0 \n" );
+            m_kWriter.flush();
+        }
+        catch ( Exception localException ) {
+
+        }
+
+        ++nEventCounter;
+    }
+
+    public void DeviceMoveXToEvent( int x ) {
+        if ( m_kReader == null || m_kWriter == null ) {
+            return;
+        }
+
+        x = ( int ) ( ( float ) x * 1.333333 );
+
+        try {
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 3 53 " + x + " \n" );
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 0 0 0 \n" );
+            m_kWriter.flush();
+        }
+        catch ( Exception localException ) {
+
+        }
+    }
+
+    public void DeviceMoveYToEvent( int y ) {
+        if ( m_kReader == null || m_kWriter == null ) {
+            return;
+        }
+
+        y = ( int ) ( ( float ) y * 1.333333 );
+
+        try {
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 3 54 " + y + " \n" );
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 0 0 0 \n" );
+            m_kWriter.flush();
+        }
+        catch ( Exception localException ) {
+
+        }
+    }
+
+    public void DeviceMoveToEvent( int x, int y ) {
+        if ( m_kReader == null || m_kWriter == null ) {
+            return;
+        }
+
+        x = ( int ) ( ( float ) x * 1.333333 );
+        y = ( int ) ( ( float ) y * 1.333333 );
+
+        try {
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 3 53 " + x + " \n" );
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 3 54 " + y + " \n" );
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 0 0 0 \n" );
+            m_kWriter.flush();
+        }
+        catch ( Exception localException ) {
+
+        }
+    }
+
+    public void DeviceUpEvent( ) {
+        if ( m_kReader == null || m_kWriter == null ) {
+            return;
+        }
+
+        try {
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 3 57 -1 \n" );
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 1 330 0 \n" );
+            m_kWriter.writeBytes( "sendevent /dev/input/event3 0 0 0 \n" );
+            m_kWriter.flush();
+        }
+        catch ( Exception localException ) {
+
+        }
+    }
 }

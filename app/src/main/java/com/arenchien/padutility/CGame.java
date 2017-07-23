@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.media.Image;
 import android.os.Debug;
 import android.util.Log;
@@ -49,12 +50,12 @@ public class CGame {
         }
 
 
-        public void DrawGrid( CanvasImageView kCanvas ){
+        public void DrawGrid( CanvasImageView kCanvas ) {
             int nCounter = 0;
             int nCounter2 = 0;
-            kCanvas.X = new float[m_nGridXSize*m_nGridYSize*2];
-            kCanvas.Y = new float[m_nGridXSize*m_nGridYSize*2];
-            kCanvas.PaintColor = new int[m_nGridXSize*m_nGridYSize];
+            kCanvas.X = new float[ m_nGridXSize * m_nGridYSize * 2 ];
+            kCanvas.Y = new float[ m_nGridXSize * m_nGridYSize * 2 ];
+            kCanvas.PaintColor = new int[ m_nGridXSize * m_nGridYSize ];
             for ( int x = 0; x < m_nGridXSize; ++x ) {
                 for ( int y = 0; y < m_nGridYSize; ++y ) {
                     int nOffsetX = ( m_nGridWidth - m_nValidSize ) / 2;
@@ -64,15 +65,28 @@ public class CGame {
                     int nMaxX = ( x + 1 ) * m_nGridWidth - 1 - nOffsetX + m_nGridX;
                     int nMaxY = ( y + 1 ) * m_nGridHeight - 1 - nOffsetY + m_nGridY;
 
-                    switch ( GetBall(x, y) )
-                    {
-                        case Ball_Fire:kCanvas.PaintColor[nCounter2]=Color.RED;break;
-                        case Ball_Water:kCanvas.PaintColor[nCounter2]=Color.BLUE;break;
-                        case Ball_Wood:kCanvas.PaintColor[nCounter2]=Color.GREEN;break;
-                        case Ball_Light:kCanvas.PaintColor[nCounter2]=Color.YELLOW;break;
-                        case Ball_Dark:kCanvas.PaintColor[nCounter2]=Color.BLACK;break;
-                        case Ball_Heal:kCanvas.PaintColor[nCounter2]=Color.MAGENTA;break;
-                        default:kCanvas.PaintColor[nCounter2]=Color.WHITE;break;
+                    switch ( GetBall( x, y ) ) {
+                        case Ball_Fire:
+                            kCanvas.PaintColor[ nCounter2 ] = Color.RED;
+                            break;
+                        case Ball_Water:
+                            kCanvas.PaintColor[ nCounter2 ] = Color.BLUE;
+                            break;
+                        case Ball_Wood:
+                            kCanvas.PaintColor[ nCounter2 ] = Color.GREEN;
+                            break;
+                        case Ball_Light:
+                            kCanvas.PaintColor[ nCounter2 ] = Color.YELLOW;
+                            break;
+                        case Ball_Dark:
+                            kCanvas.PaintColor[ nCounter2 ] = Color.BLACK;
+                            break;
+                        case Ball_Heal:
+                            kCanvas.PaintColor[ nCounter2 ] = Color.MAGENTA;
+                            break;
+                        default:
+                            kCanvas.PaintColor[ nCounter2 ] = Color.WHITE;
+                            break;
                     }
                     ++nCounter2;
 
@@ -166,6 +180,13 @@ public class CGame {
             }
         }
         return kBoard;
+    }
+
+    static public Point BoardIndexToScreenPosition( int x, int y ) {
+        Point kResult = new Point();
+        kResult.x = ( int ) ( m_nGridWidth * x + m_nGridWidth * 0.5f ) + m_nGridX;
+        kResult.y = ( int ) ( m_nGridHeight * y + m_nGridHeight * 0.5f ) + m_nGridY;
+        return kResult;
     }
 /*
     private ColorIndex Analysis( Screen kScreen ) {

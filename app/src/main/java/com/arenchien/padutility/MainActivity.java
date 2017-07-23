@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Point;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -36,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import static java.lang.Thread.sleep;
 
 public class MainActivity extends Activity implements ResourceFinder {
     public final Globals m_kLuaGlobals;
@@ -610,14 +613,34 @@ public class MainActivity extends Activity implements ResourceFinder {
                     if ( nButtonIndex == m_nCloseButtonIndex ) {
                         m_kFloatingWindow.ToggleMainVisible();
                         m_kShowBarCheckBox.setChecked( false );
-                    }
-                    else if ( nButtonIndex == m_nTestButtonIndex ) {
-                        //String strFile = GetTempPath() + "/temp.png";
-                        //TakeScreenshot( strFile );
+                    } else if ( nButtonIndex == m_nTestButtonIndex ) {
+                        /*
                         Screen kScreen = m_kRootUtility.GetScreen();
                         CGame.CBoard kBoard = m_kGame.Analysis( kScreen );
                         kBoard.DrawGrid( m_kCanvas);
                         m_kCanvasImageLayer.Show();
+                        */
+//                        try {
+//                            Point kStart = CGame.BoardIndexToScreenPosition(0,0);
+//                            Point kSEnd = CGame.BoardIndexToScreenPosition(5,0);
+//                            int nOffsetX = 60;
+//                            int nOffsetY = 60;
+//
+//                            sleep( 2000 );
+//                            m_kRootUtility.DeviceDownEvent( 600, 1000 );
+//                            while ( nStartY < nEndY ) {
+//                                sleep( 100 );
+//                                nStartY += nOffsetY;
+//                                if ( nStartY > nEndY ) {
+//                                    nStartY = nEndY;
+//                                }
+//                                m_kRootUtility.DeviceMoveYToEvent( nStartY );
+//                            }
+//                            m_kRootUtility.DeviceUpEvent();
+//                        }
+//                        catch ( InterruptedException e ) {
+//
+//                        }
                     } else {
                         LaunchThis();
                     }
