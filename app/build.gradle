@@ -27,4 +27,5 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':luaj-jse-3.0.1')
+    compile 'com.android.support:design:23.1.1'
 }
