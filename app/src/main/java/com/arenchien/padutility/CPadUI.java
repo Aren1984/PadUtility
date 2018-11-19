@@ -3,6 +3,7 @@ package com.arenchien.padutility;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -13,6 +14,11 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
 /**
  * Created by ArenChien on 2018/10/9.
  */
@@ -22,7 +28,6 @@ public class CPadUI {
     CStableListView m_kListView;
     Button m_kNewBattleButton;
     Button m_kSaveButton;
-    Button m_kUpdateButton;
     Button m_kLoadButton;
     Button m_kDeleteButton;
     Button m_kClearButton;
@@ -43,14 +48,13 @@ public class CPadUI {
     public void onCreate( Activity kActivity ) {
         m_kActivity = kActivity;
         m_kListView = new CStableListView( m_kActivity, R.id.ListViewRecord );
-        m_kNewBattleButton = (Button) m_kActivity.findViewById( R.id.ButtonNewBattle );
-        m_kSaveButton = (Button) m_kActivity.findViewById( R.id.ButtonSave );
-        m_kUpdateButton = (Button) m_kActivity.findViewById( R.id.ButtonUpdate );
-        m_kLoadButton = (Button) m_kActivity.findViewById( R.id.ButtonLoad );
-        m_kDeleteButton = (Button) m_kActivity.findViewById( R.id.ButtonDelete );
-        m_kClearButton = (Button) m_kActivity.findViewById( R.id.ButtonClear );
-        m_kTestButton = (Button) m_kActivity.findViewById( R.id.ButtonTest );
-        m_kShowBarCheckBox = (CheckBox) m_kActivity.findViewById( R.id.CheckBoxShowBar );
+        m_kNewBattleButton = ( Button ) m_kActivity.findViewById( R.id.ButtonNewBattle );
+        m_kSaveButton = ( Button ) m_kActivity.findViewById( R.id.ButtonSave );
+        m_kLoadButton = ( Button ) m_kActivity.findViewById( R.id.ButtonLoad );
+        m_kDeleteButton = ( Button ) m_kActivity.findViewById( R.id.ButtonDelete );
+        m_kClearButton = ( Button ) m_kActivity.findViewById( R.id.ButtonClear );
+        m_kTestButton = ( Button ) m_kActivity.findViewById( R.id.ButtonTest );
+        m_kShowBarCheckBox = ( CheckBox ) m_kActivity.findViewById( R.id.CheckBoxShowBar );
         m_kShowBarCheckBox.setChecked( true );
 
         m_kShowBarCheckBox.setOnClickListener( new CheckBox.OnClickListener() {
@@ -68,7 +72,7 @@ public class CPadUI {
                         //SetWifiActive(false);
                         kPadData.ClearRecord();
                         kPadData.RecordCurrentStage( "Init" );
-                        kPadData.RefreshList( m_kListView, 0 );
+                        RefreshList( 0 );
                         RefreshButtonState();
                         LaunchPad();
                     }
@@ -83,29 +87,6 @@ public class CPadUI {
                 Save();
             }
         } );
-
-        m_kUpdateButton.setOnClickListener( new Button.OnClickListener() {
-            @Override
-            public void onClick( View v ) {
-                final int nSelectIndex = m_kListView.GetSelectedIndex();
-                if ( nSelectIndex == -1 ) {
-                    return;
-                }
-
-                DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
-                    public void onClick( DialogInterface dialog, int which ) {
-                        //SetWifiActive(false);
-                        String strName = m_kListView.GetText( nSelectIndex );
-                        kPadData.RecordCurrentStage( strName );
-                        kPadData.RefreshList( m_kListView, nSelectIndex );
-                        RefreshButtonState();
-                        LaunchPad();
-                    }
-                };
-                CUiUtility.Question( v, "是否要覆蓋?", OkClick );
-            }
-        } );
-
 
         m_kLoadButton.setOnClickListener( new Button.OnClickListener() {
             @Override
@@ -127,7 +108,7 @@ public class CPadUI {
                     public void onClick( DialogInterface dialog, int which ) {
                         String strName = m_kListView.GetText( nSelectIndex );
                         kPadData.DeleteRecord( strName );
-                        kPadData.RefreshList( m_kListView, 0 );
+                        RefreshList( 0 );
                         RefreshButtonState();
                     }
                 };
@@ -170,36 +151,59 @@ public class CPadUI {
             }
         } );
 
+        RefreshList( 0 );
+        //RefreshButtonState();
+
+        Intent kIntent = new Intent( m_kActivity, FloatingWindow.class );
+        m_kActivity.startService( kIntent );
+        m_kActivity.bindService( kIntent, m_kServiceConnection, Context.BIND_AUTO_CREATE );
     }
 
-    protected void LaunchPad() {
+    protected void LaunchPad( ) {
         CUiUtility.LaunchApp( m_kActivity, kPadData.GetPackageName() );
     }
 
-    private void StopPad() {
+    private void StopPad( ) {
         CUiUtility.StopApp( m_kActivity, kPadData.GetPackageName() );
     }
 
-    protected void RefreshButtonState() {
+    protected void RefreshButtonState( ) {
         m_kNewBattleButton.setEnabled( true );
         m_kSaveButton.setEnabled( true );
 
         int nSelectIndex = m_kListView.GetSelectedIndex();
         if ( nSelectIndex == -1 ) {
-            m_kUpdateButton.setEnabled( false );
             m_kDeleteButton.setEnabled( false );
             m_kLoadButton.setEnabled( false );
         } else if ( nSelectIndex == m_kListView.GetCount() - 1 ) {
-            m_kUpdateButton.setEnabled( false );
             m_kDeleteButton.setEnabled( false );
             m_kLoadButton.setEnabled( true );
         } else {
-            m_kUpdateButton.setEnabled( true );
             m_kDeleteButton.setEnabled( true );
             m_kLoadButton.setEnabled( true );
         }
     }
 
+    protected void RefreshList( int nSelected ) {
+        File kTargetFolder = new File( kPadData.GetTargetPath() );
+        File[] kSubFiles = kTargetFolder.listFiles();
+        if ( kSubFiles == null ) {
+            return;
+        }
+        final ArrayList< String > list = new ArrayList< String >();
+        final ArrayList< String > kKeyList = new ArrayList< String >();
+        for ( int i = kSubFiles.length - 1; i >= 0; --i ) {
+            if ( kSubFiles[ i ].isDirectory() ) {
+                Date kLastModDate = new Date( kSubFiles[ i ].lastModified() );
+                SimpleDateFormat formatter = new SimpleDateFormat( "MMM dd HH:mm:ss" );
+                list.add( "[" + kSubFiles[ i ].getName() + "] - " + formatter.format( kLastModDate ) );
+                kKeyList.add( kSubFiles[ i ].getName() );
+            }
+        }
+
+        m_kListView.SetData( list, kKeyList );
+        //m_kListView.SetSelectedIndex( nSelected, false );
+    }
 
     public void Restore( String strRecordName ) {
         //SetWifiActive(false);
@@ -223,13 +227,13 @@ public class CPadUI {
         }
     }
 
-    public void Save() {
+    public void Save( ) {
         int nCounter = kPadData.ReadCounter();
         ++nCounter;
         kPadData.WriteCounter( nCounter );
         String strName = String.valueOf( nCounter );
         kPadData.RecordCurrentStage( strName );
-        kPadData.RefreshList( this, m_kListView, , 0 );
+        RefreshList( 0 );
         RefreshButtonState();
         LaunchPad();
     }
@@ -242,6 +246,20 @@ public class CPadUI {
         Restore( v, nSelectIndex, bQuestion );
     }
 
+    public void onResume( ) {
+        if ( m_nActionIndex == -1 ) {
+            return;
+        }
+
+        if ( m_nActionIndex == m_nSaveButtonIndex ) {
+            Save();
+        } else if ( m_nActionIndex == m_nLoadButtonIndex ) {
+            Load( m_kActivity.findViewById( android.R.id.content ), true );
+        }
+
+        m_nActionIndex = -1;
+    }
+
     private ServiceConnection m_kServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceDisconnected( ComponentName name ) {
@@ -252,7 +270,7 @@ public class CPadUI {
             if ( m_kFloatingWindow != null ) {
                 return;
             }
-            m_kFloatingWindow = ( (FloatingWindow.LocalBinder) service ).getService();
+            m_kFloatingWindow = ( ( FloatingWindow.LocalBinder ) service ).getService();
 
             m_kCanvas = new CanvasImageView( m_kFloatingWindow );
             m_kCanvasImageLayer = m_kFloatingWindow.new CImageLayer( m_kCanvas, 1080, 1920, 0, 0, false );
@@ -264,8 +282,7 @@ public class CPadUI {
                 @Override
                 public void OnButtonClicked( View v, int nButtonIndex ) {
                     if ( nButtonIndex == m_nCloseButtonIndex ) {
-                        m_kFloatingWindow.ToggleMainVisible();
-                        m_kShowBarCheckBox.setChecked( false );
+                        m_kShowBarCheckBox.setChecked( m_kFloatingWindow.ToggleMainVisible() );
                     } else if ( nButtonIndex == m_nTestButtonIndex ) {
                         /*
                         Screen kScreen = m_kRootUtility.GetScreen();
@@ -295,11 +312,13 @@ public class CPadUI {
 //
 //                        }
                     } else {
-                        CUiUtility.LaunchThis();
+                        CUiUtility.LaunchThis( m_kActivity );
                     }
                     m_nActionIndex = nButtonIndex;
                 }
             } );
+
+            m_kShowBarCheckBox.setChecked( m_kFloatingWindow.ToggleMainVisible() );
         }
     };
 }

@@ -3,8 +3,10 @@ package com.arenchien.padutility;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.view.View;
 
 import static android.content.Context.ACTIVITY_SERVICE;
@@ -50,4 +52,15 @@ public class CUiUtility {
             }
         }
     }
+/*
+    private void SetWifiActive( boolean bActive ) {
+        WifiManager wifiManager = (WifiManager) this.getSystemService( Context.WIFI_SERVICE );
+        wifiManager.setWifiEnabled( bActive );
+    }
+
+    private boolean GetWifiActive() {
+        WifiManager wifiManager = (WifiManager) this.getSystemService( Context.WIFI_SERVICE );
+        return wifiManager.getWifiState() == WifiManager.WIFI_STATE_ENABLED;
+    }
+*/
 }

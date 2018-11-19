@@ -2,8 +2,10 @@ package com.arenchien.padutility;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -18,12 +20,16 @@ import java.util.List;
 public class CStableListView {
     ListView m_kListView;
     Context m_kContext;
-    int m_nResourceId;
+    int m_nListViewResourceId;
 
     CStableListView( Activity kActivity, int nResourceId ) {
         m_kContext = kActivity;
-        m_kListView = (ListView) kActivity.findViewById( nResourceId );
-        m_nResourceId = nResourceId;
+        m_kListView = ( ListView ) kActivity.findViewById( nResourceId );
+        m_nListViewResourceId = nResourceId;
+    }
+
+    public void setOnItemClickListener(@Nullable AdapterView.OnItemClickListener listener) {
+        m_kListView.setOnItemClickListener( listener );
     }
 
     public String GetText( int nIndex ) {
@@ -48,7 +54,7 @@ public class CStableListView {
     }
 
     public void SetData( ArrayList<String> kList, ArrayList<String> kKeyList ) {
-        StableArrayAdapter adapter = new StableArrayAdapter( m_kContext, m_nResourceId, kList, kKeyList );
+        StableArrayAdapter adapter = new StableArrayAdapter( m_kContext, android.R.layout.simple_list_item_1, kList, kKeyList );
         m_kListView.setAdapter( adapter );
         m_kListView.setSelection( 0 );
         adapter.setSelectItem( 0 );
@@ -89,7 +95,12 @@ public class CStableListView {
         @Override
         public long getItemId( int position ) {
             String item = getItem( position );
-            return mIdMap.get( item );
+            if ( mIdMap.containsKey( item ) ) {
+                return mIdMap.get( item );
+            }
+            else {
+                return 0;
+            }
         }
 
         @Override

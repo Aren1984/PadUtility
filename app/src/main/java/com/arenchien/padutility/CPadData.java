@@ -37,7 +37,7 @@ public class CPadData {
         return false;//kRadioButton.isChecked();
     }
 
-    private String GetSourcePath() {
+    public String GetSourcePath() {
         if ( IsJapan() ) {
             return m_strJapan + m_strSourceFolder;
         } else {
@@ -45,7 +45,7 @@ public class CPadData {
         }
     }
 
-    private String GetTargetPath() {
+    public String GetTargetPath() {
         if ( IsJapan() ) {
             return m_strJapan + m_strTargetFolder;
         } else {
@@ -137,26 +137,7 @@ public class CPadData {
         }
     }
 
-    public void RefreshList( CStableListView kListView, int nSelected ) {
-        File kTargetFolder = new File( GetTargetPath() );
-        File[] kSubFiles = kTargetFolder.listFiles();
-        if ( kSubFiles == null ) {
-            return;
-        }
-        final ArrayList<String> list = new ArrayList<String>();
-        final ArrayList<String> kKeyList = new ArrayList<String>();
-        for ( int i = kSubFiles.length - 1; i >= 0; --i ) {
-            if ( kSubFiles[ i ].isDirectory() ) {
-                Date kLastModDate = new Date( kSubFiles[ i ].lastModified() );
-                SimpleDateFormat formatter = new SimpleDateFormat( "MMM dd HH:mm:ss" );
-                list.add( "[" + kSubFiles[ i ].getName() + "] - " + formatter.format( kLastModDate ) );
-                kKeyList.add( kSubFiles[ i ].getName() );
-            }
-        }
 
-        kListView.SetData( list, kKeyList );
-        kListView.SetSelectedIndex( nSelected );
-    }
 
 
 

@@ -131,7 +131,7 @@ public class FloatingWindow extends Service {
         m_kButtons.remove( nButtonIndex );
     }
 
-    public void ToggleMainVisible() {
+    public boolean ToggleMainVisible() {
         if ( m_bShowMain ) {
             m_kMainIcon.Hide();
             for ( int i = 0; i < m_kButtons.size(); ++i ) {
@@ -147,6 +147,7 @@ public class FloatingWindow extends Service {
             }
             m_bShowMain = true;
         }
+        return m_bShowMain;
     }
 
     private WindowManager m_kWindowManager;
