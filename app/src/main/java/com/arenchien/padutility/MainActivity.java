@@ -23,9 +23,6 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TabHost;
 
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.lib.ResourceFinder;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

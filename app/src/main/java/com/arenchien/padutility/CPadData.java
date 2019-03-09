@@ -25,19 +25,19 @@ import java.util.List;
  */
 
 public class CPadData {
-    String m_strJapan = "/sdcard/.001.pad";
-    String m_strTw = "/sdcard/.002.padtw";
-    String m_strSourceFolder = "/files";
-    String m_strTargetFolder = "/backup";
-    String m_strPackageNameJp = "jp.gungho.pad";
-    String m_strPackageNameTw = "jp.gungho.padHT";
+    static String m_strJapan = "/sdcard/.001.pad";
+    static String m_strTw = "/sdcard/.002.padtw";
+    static String m_strSourceFolder = "/files";
+    static String m_strTargetFolder = "/backup";
+    static String m_strPackageNameJp = "jp.gungho.pad";
+    static String m_strPackageNameTw = "jp.gungho.padHT";
 
-    private boolean IsJapan() {
+    static private boolean IsJapan() {
         //RadioButton kRadioButton = ( RadioButton )findViewById( R.id.JapanRadioButton );
         return false;//kRadioButton.isChecked();
     }
 
-    public String GetSourcePath() {
+    static public String GetSourcePath() {
         if ( IsJapan() ) {
             return m_strJapan + m_strSourceFolder;
         } else {
@@ -45,7 +45,7 @@ public class CPadData {
         }
     }
 
-    public String GetTargetPath() {
+    static public String GetTargetPath() {
         if ( IsJapan() ) {
             return m_strJapan + m_strTargetFolder;
         } else {

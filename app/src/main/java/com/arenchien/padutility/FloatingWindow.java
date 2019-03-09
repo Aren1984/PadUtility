@@ -14,6 +14,13 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,9 +59,12 @@ public class FloatingWindow extends Service {
     public void onCreate() {
         super.onCreate();
 
+        m_strSettingsFile = CPadData.GetTargetPath() + "/FloatingSettings.log" ;
+        ReadSettings();
+
         m_kWindowManager = (WindowManager) getSystemService( WINDOW_SERVICE );
 
-        m_kMainIcon = new CImageLayer( this, R.drawable.main_open, m_nMainIconWidth, m_nIconSize, 0, 200, true, true );
+        m_kMainIcon = new CImageLayer( this, R.drawable.main_open, m_nMainIconWidth, m_nIconSize, m_nMainX, m_nMainY, true, true );
 
         m_kMainIcon.SetClickListener( new OnClickListener() {
             @Override
@@ -79,6 +89,7 @@ public class FloatingWindow extends Service {
                 for ( int i = 0; i < m_kButtons.size(); ++i ) {
                     m_kButtons.get( i ).Move( nOffsetX, nOffsetY );
                 }
+                WriteSettings();
             }
         } );
 
@@ -87,6 +98,12 @@ public class FloatingWindow extends Service {
         Point size = new Point();
         display.getSize( size );
         m_nScreenWidth = size.y;
+        if ( m_bShowMain ) {
+            m_kMainIcon.Show();
+        }
+        else {
+            m_kMainIcon.Hide();
+        }
     }
 
     @Override
@@ -115,7 +132,7 @@ public class FloatingWindow extends Service {
             }
         } );
 
-        if ( m_bShowAction ) {
+        if ( m_bShowMain && m_bShowAction ) {
             kButton.Show();
         }
 
@@ -147,9 +164,15 @@ public class FloatingWindow extends Service {
             }
             m_bShowMain = true;
         }
+        WriteSettings();
         return m_bShowMain;
     }
 
+    public boolean IsVisible() {
+        return m_kMainIcon.Visible();
+    }
+
+    private String m_strSettingsFile;
     private WindowManager m_kWindowManager;
     private CImageLayer m_kMainIcon;
     private List<CImageLayer> m_kButtons = new ArrayList<CImageLayer>();
@@ -157,6 +180,8 @@ public class FloatingWindow extends Service {
     private boolean m_bShowAction = false;
     private int m_nIconSize = 128;
     private int m_nMainIconWidth = 64;
+    private int m_nMainX = 0;
+    private int m_nMainY = 200;
     private int m_nMaxWidth = m_nMainIconWidth;
     private OnButtonClickedListener m_fnButtonClickedListener;
     private int m_nScreenWidth = 0;
@@ -214,8 +239,8 @@ public class FloatingWindow extends Service {
                             return true;
                         case MotionEvent.ACTION_MOVE:
                             if ( m_bEnableDrag ) {
-                                int nOffsetX = (int) ( event.getRawX() - m_fLastX );
-                                int nOffsetY = (int) ( event.getRawY() - m_fLastY );
+                                int nOffsetX = ( int ) ( event.getRawX() - m_fLastX );
+                                int nOffsetY = ( int ) ( event.getRawY() - m_fLastY );
                                 m_kParameter.x += nOffsetX;
                                 m_kParameter.y += nOffsetY;
                                 if ( m_kParameter.x < 0 ) {
@@ -275,6 +300,14 @@ public class FloatingWindow extends Service {
             }
         }
 
+        public void MoveTo( int nX, int nY ) {
+            m_kParameter.x += nX;
+            m_kParameter.y += nY;
+            if ( m_bVisible ) {
+                m_kWindowManager.updateViewLayout( m_kImage, m_kParameter );
+            }
+        }
+
         public void Move( int nOffsetX, int nOffsetY ) {
             m_kParameter.x += nOffsetX;
             m_kParameter.y += nOffsetY;
@@ -299,6 +332,60 @@ public class FloatingWindow extends Service {
 
         public void SetImage( int nResourceId ) {
             m_kImage.setImageResource( nResourceId );
+        }
+
+        public int X() {
+            return m_kParameter.x;
+        }
+
+        public int Y() {
+            return m_kParameter.y;
+        }
+
+        public boolean Visible() {
+            return m_bVisible;
+        }
+    }
+
+    public void ReadSettings() {
+        try {
+            File kFile = new File( m_strSettingsFile );
+            InputStream kInput = new FileInputStream( kFile );
+
+            byte[] kBuffer = new byte[ 4 ];
+            kInput.read( kBuffer );
+            ByteBuffer wrapped = ByteBuffer.wrap( kBuffer );
+            m_nMainX = wrapped.getInt();
+            kInput.read( kBuffer );
+            wrapped = ByteBuffer.wrap( kBuffer );
+            m_nMainY = wrapped.getInt();
+            kInput.read( kBuffer );
+            wrapped = ByteBuffer.wrap( kBuffer );
+            int nVisible = wrapped.getInt();
+            m_bShowMain = nVisible > 0;
+            kInput.read( kBuffer );
+            wrapped = ByteBuffer.wrap( kBuffer );
+            nVisible = wrapped.getInt();
+            m_bShowAction = nVisible > 0;
+            kInput.close();
+        } catch ( IOException ex ) {
+        }
+    }
+
+    public void WriteSettings() {
+        try {
+            File kFile = new File( m_strSettingsFile );
+            OutputStream kOutput = new FileOutputStream( kFile );
+            byte[] kBuffer = ByteBuffer.allocate( 4 ).putInt( m_kMainIcon.X() ).array();
+            kOutput.write( kBuffer );
+            kBuffer = ByteBuffer.allocate( 4 ).putInt( m_kMainIcon.Y() ).array();
+            kOutput.write( kBuffer );
+            kBuffer = ByteBuffer.allocate( 4 ).putInt( m_kMainIcon.Visible() ? 1 : 0 ).array();
+            kOutput.write( kBuffer );
+            kBuffer = ByteBuffer.allocate( 4 ).putInt( m_bShowAction ? 1 : 0 ).array();
+            kOutput.write( kBuffer );
+            kOutput.close();
+        } catch ( IOException ex ) {
         }
     }
 

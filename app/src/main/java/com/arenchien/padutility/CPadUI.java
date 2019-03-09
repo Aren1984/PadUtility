@@ -318,7 +318,7 @@ public class CPadUI {
                 }
             } );
 
-            m_kShowBarCheckBox.setChecked( m_kFloatingWindow.ToggleMainVisible() );
+            m_kShowBarCheckBox.setChecked( m_kFloatingWindow.IsVisible() );
         }
     };
 }
