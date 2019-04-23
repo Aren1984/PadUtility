@@ -25,6 +25,7 @@ import java.util.List;
  */
 
 public class CPadData {
+    static Boolean m_bIsJapan = false;
     static String m_strJapan = "/sdcard/.001.pad";
     static String m_strTw = "/sdcard/.002.padtw";
     static String m_strSourceFolder = "/files";
@@ -33,8 +34,10 @@ public class CPadData {
     static String m_strPackageNameTw = "jp.gungho.padHT";
 
     static private boolean IsJapan() {
-        //RadioButton kRadioButton = ( RadioButton )findViewById( R.id.JapanRadioButton );
-        return false;//kRadioButton.isChecked();
+        return m_bIsJapan;
+    }
+    static public void SetIsJapan( boolean bEnable ) {
+        m_bIsJapan = bEnable;
     }
 
     static public String GetSourcePath() {

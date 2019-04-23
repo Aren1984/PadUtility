@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.RadioButton;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -33,6 +34,8 @@ public class CPadUI {
     Button m_kClearButton;
     Button m_kTestButton;
     CheckBox m_kShowBarCheckBox;
+    RadioButton m_kJapan;
+    RadioButton m_kTw;
 
     CanvasImageView m_kCanvas;
     FloatingWindow m_kFloatingWindow = null;
@@ -56,11 +59,26 @@ public class CPadUI {
         m_kTestButton = ( Button ) m_kActivity.findViewById( R.id.ButtonTest );
         m_kShowBarCheckBox = ( CheckBox ) m_kActivity.findViewById( R.id.CheckBoxShowBar );
         m_kShowBarCheckBox.setChecked( true );
+        m_kJapan = ( RadioButton ) m_kActivity.findViewById( R.id.PadJapanRadioButton );
+        m_kTw = ( RadioButton ) m_kActivity.findViewById( R.id.PadTwRadioButton );
 
         m_kShowBarCheckBox.setOnClickListener( new CheckBox.OnClickListener() {
             @Override
             public void onClick( View v ) {
                 m_kFloatingWindow.ToggleMainVisible();
+            }
+        } );
+
+        m_kJapan.setOnClickListener( new CheckBox.OnClickListener() {
+            @Override
+            public void onClick( View v ) {
+                kPadData.SetIsJapan( m_kJapan.isChecked() );
+            }
+        } );
+        m_kTw.setOnClickListener( new CheckBox.OnClickListener() {
+            @Override
+            public void onClick( View v ) {
+                kPadData.SetIsJapan( m_kJapan.isChecked() );
             }
         } );
 
@@ -159,15 +177,15 @@ public class CPadUI {
         m_kActivity.bindService( kIntent, m_kServiceConnection, Context.BIND_AUTO_CREATE );
     }
 
-    protected void LaunchPad( ) {
+    protected void LaunchPad() {
         CUiUtility.LaunchApp( m_kActivity, kPadData.GetPackageName() );
     }
 
-    private void StopPad( ) {
+    private void StopPad() {
         CUiUtility.StopApp( m_kActivity, kPadData.GetPackageName() );
     }
 
-    protected void RefreshButtonState( ) {
+    protected void RefreshButtonState() {
         m_kNewBattleButton.setEnabled( true );
         m_kSaveButton.setEnabled( true );
 
@@ -227,7 +245,7 @@ public class CPadUI {
         }
     }
 
-    public void Save( ) {
+    public void Save() {
         int nCounter = kPadData.ReadCounter();
         ++nCounter;
         kPadData.WriteCounter( nCounter );
@@ -246,7 +264,7 @@ public class CPadUI {
         Restore( v, nSelectIndex, bQuestion );
     }
 
-    public void onResume( ) {
+    public void onResume() {
         if ( m_nActionIndex == -1 ) {
             return;
         }
