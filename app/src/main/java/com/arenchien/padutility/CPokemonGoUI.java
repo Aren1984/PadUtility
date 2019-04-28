@@ -40,9 +40,7 @@ public class CPokemonGoUI {
     public CPokemonGoUI() {
         m_kCopyFolder[ 0 ] = "/shared_prefs";
         m_kCopyFolder[ 1 ] = "/files/il2cpp";
-        m_kCopyFolder[ 2 ] = "/files/remote_config_cache";;
-        //m_kCopyFolder[ 3 ] = "/files/DiskCache";
-        //m_kCopyFolder[ 4 ] = "/cache";
+        m_kCopyFolder[ 2 ] = "/files/remote_config_cache";
     }
 
     public void onCreate( Activity kActivity ) {
